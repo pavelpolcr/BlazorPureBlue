@@ -1,18 +1,19 @@
 ﻿
 @if (IsActive == true)
 {
-    <input class="form-check" type="checkbox" value=@IsChecked/>
+    <input class="form-check" type="checkbox" value=@rec.TaskState onclick="Clicktest"/>
 }
 else
 {
-    <input class="form-check" type="checkbox" value=@IsChecked disabled />
+    <input class="form-check" type="checkbox" value=@rec.TaskState onclick="Clicktest" disabled />
 }
 
 @code {
     [Parameter]
-    public bool IsChecked { get; set; }
-    [Parameter]
+    public Blue.DayTaskRecord rec { get; set; } = new Blue.DayTaskRecord();
+    
     public bool IsActive { get; set; }
+
 
 
 }
