@@ -1,0 +1,14 @@
+﻿
+
+<input class="form-check" type="checkbox" />
+
+@code {
+
+    public bool IsChecked { get; set; }
+    [Parameter]
+    public DateTime ExaminedDate { get; set; }
+    [Parameter]
+    public int TaskIndex { get; set; }
+    BlueHandler bh = new BlueHandler();
+
+}

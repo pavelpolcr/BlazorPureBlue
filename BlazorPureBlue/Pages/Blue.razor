@@ -1,0 +1,94 @@
+﻿@page "/blue"
+
+<h3>@Today.Year.ToString(), @Today.ToString("MMMM")</h3>
+<button type="button" class="btn btn-primary btn-sm" @onclick="SubstractMonth">Previous Month</button>
+<button type="button" class="btn btn-primary btn-sm" @onclick="AddMonth">Next Month</button>
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th scope="col">Den</th>
+            @for (int i = 0; i <= DateTime.DaysInMonth(Year, Month); i++)
+            {
+                <th scope="col">@i</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @for (int j = 0; j <= 7; j++)
+        {
+        <tr>
+            <th scope="row">polozka @j</th>
+            @for (int i = 0; i <= DateTime.DaysInMonth(Year, Month); i++)
+            {
+                @code{
+                    bool IsChecked = false;
+                    DateTime trydate = DateTime.Now.Date;
+                }
+                @if (!IsCheckedDictionary.TryGetValue(trydate, out IsChecked))
+                {
+                    IsCheckedDictionary.Add(trydate, false);
+                }
+                @if (i == DateTime.Now.Day&&Today.Month==DateTime.Now.Month&&Today.Year==DateTime.Now.Year)
+                {
+                    <td><input class="form-check" type="checkbox" @onclick="GetValueCheckBox" @onmouseout="SaveData"/></td>
+                }
+                else
+                {
+                    <td><input class="form-check" type="checkbox" disabled @onclick="GetValueCheckBox" @onmouseout="SaveData"/></td>
+                }
+                
+            }
+
+
+        </tr>
+        }
+    </tbody>
+</table>
+@code {
+    List<string> BLItems = new List<string>();
+    Dictionary<DateTime, bool> IsCheckedDictionary = new Dictionary<DateTime, bool>();
+    DateTime Today = DateTime.Now;
+    int Month = DateTime.Now.Month;
+    int Year = DateTime.Now.Year;
+
+
+    void SubstractMonth()
+    {
+        Today = Today.AddMonths(-1);
+        Month = Today.Month;
+        Year = Today.Year;
+    }
+    void AddMonth()
+    {
+        Today = Today.AddMonths(1);
+        Month = Today.Month;
+        Year = Today.Year;
+    }
+    void SaveData()
+    {
+
+    }
+    void GetValueCheckBox()
+    {
+
+    }
+    public class BlueHandler
+    {
+        public BlueHandler()
+        {
+            DayTaskRecords = new List<DayTaskRecord>();
+            TaskTitles = new List<string>();
+        }
+
+        public List<DayTaskRecord> DayTaskRecords { get; set; }
+
+        public List<string> TaskTitles { get; set; }
+    }
+    public class DayTaskRecord
+    {
+        public DateTime Date { get; set; }
+        public int TaskIndex { get; set; }
+    }
+
+
+}
