@@ -1,6 +1,5 @@
 ﻿@page "/blue"
 @inject Blazored.LocalStorage.ISyncLocalStorageService ls
-
 <h3>@Today.Year.ToString() @Today.ToString("MMMM").ToUpper()</h3>
 <div class="row">
 
@@ -24,204 +23,161 @@
     </div>
 </div>
 
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th scope="col">Den</th>
-            @for (int i = 1; i <= DateTime.DaysInMonth(Year, Month); i++)
-            {
-                @if (i == DateTime.Now.Day && Today.Month == DateTime.Now.Month && Today.Year == DateTime.Now.Year)
-                {
-                    <th scope="col" class="text-info">@i</th>
-                }
-                else
-                {
-                    <th scope="col">@i</th>
-                }
-
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @for (int j = 0; j < categories.Count; j++)
-        {
-            <tr>
-                <th scope="row">@categories[j]</th>
-                @for (int i = 1; i <= DateTime.DaysInMonth(Today.Year, Month); i++)
-                {
-                    {
-                        BlueLifeField fld; //= new BlueLifeField();
-
-                        fld = actStates.Find(r => r.rec.Date.Day == i && r.rec.Date.Month == Today.Month && r.rec.Date.Year == Today.Year && r.rec.Tasktitle == categories[j]);
-
-                        <td>
-                            <BlueLifeField @ref="fld" />
-                        </td>
-
-
-
-                    }
-
-
-                </tr>
-            }
-            </tbody>
-        </table>
-@code{
-            DateTime Today = DateTime.Now;
-            int Month = DateTime.Now.Month;
-            int Year = DateTime.Now.Year;
-            bool monthUnlocked = false;
-            bool actchecked = false;
+@code {
+    DateTime Today = DateTime.Now;
+    int Month = DateTime.Now.Month;
+    int Year = DateTime.Now.Year;
+    bool monthUnlocked = false;
+    bool actchecked = false;
     public List<BlueLifeField> actStates;
-        public List<string> categories = new List<string>();
-        public BlueLifeField temp = new BlueLifeField();
+    public List<string> categories = new List<string>();
+    public BlueLifeField temp = new BlueLifeField();
 
-        protected override void OnInitialized()
+    protected override void OnInitialized()
+    {
+        actStates = new List<BlueLifeField>();
+        if (ls.ContainKey("MainList"))
         {
-            actStates = new List<BlueLifeField>();
-            if (ls.ContainKey("MainList"))
+
+            actStates = ls.GetItem<List<BlueLifeField>>("MainList");
+        }
+
+        if (ls.ContainKey("CatList"))
+        {
+
+            categories = ls.GetItem<List<string>>("CatList");
+        }
+        else
+        {
+            categories.Add("Rann9 mzt9 studenou vodo ua je3t2 n2co a+t je to dostate4n2 dlouhe");
+            ls.SetItem<List<string>>("CatList", categories);
+        }
+        CheckIfMonthIsStored();
+        LockMonth();
+
+    }
+
+    void CheckIfMonthIsStored()
+    {
+        var reslts = from state in actStates
+                     where (state.rec.Date.Month == Today.Month && state.rec.Date.Year == Today.Year)
+                     select state;
+        if (reslts.Count<BlueLifeField>() == 0)
+        {
+            for (int j = 0; j < categories.Count; j++)
             {
 
-                actStates = ls.GetItem<List<BlueLifeField>>("MainList");
+
+                for (int i = 1; i <= DateTime.DaysInMonth(Today.Year, Today.Month); i++)
+                {
+                    DateTime temp = new DateTime(Today.Year, Today.Month, i);
+                    BlueLifeField fld = new BlueLifeField();
+                    fld.rec.Date = temp;
+                    fld.rec.TaskState = false;
+                    fld.rec.Tasktitle = categories[j];
+                    fld.IsActive = true;
+                    actStates.Add(fld);
+
+                }
             }
+        }
+        ls.SetItem<List<BlueLifeField>>("MainList", actStates);
+    }
 
-            if (ls.ContainKey("CatList"))
+    void SubstractMonth()
+    {
+        Today = Today.AddMonths(-1);
+        Month = Today.Month;
+        Year = Today.Year;
+        CheckIfMonthIsStored();
+        RefillLists();
+    }
+    void AddMonth()
+    {
+        Today = Today.AddMonths(1);
+        Month = Today.Month;
+        Year = Today.Year;
+        CheckIfMonthIsStored();
+        RefillLists();
+    }
+    void SaveData()
+    {
+
+    }
+    void Clicktest()
+    {
+
+    }
+    void RefillLists()
+    {
+        foreach (var field in actStates)
+        {
+
+        }
+    }
+    void LockMonth()
+    {
+        monthUnlocked = false;
+        foreach (var item in actStates)
+        {
+            if (item.rec.Date.Day == DateTime.Now.Date.Day && item.rec.Date.Month == DateTime.Now.Date.Month && item.rec.Date.Year == DateTime.Now.Date.Year)
             {
+                item.IsActive = true;
+                InvokeAsync(() =>
+                {
 
-                categories = ls.GetItem<List<string>>("CatList");
+                    StateHasChanged();
+                });
+
             }
             else
             {
-                categories.Add("Rann9 mzt9 studenou vodo ua je3t2 n2co a+t je to dostate4n2 dlouhe");
-                ls.SetItem<List<string>>("CatList", categories);
+                item.IsActive = false;
+                InvokeAsync(() =>
+                {
+
+                    StateHasChanged();
+                });
+
             }
-            CheckIfMonthIsStored();
-            LockMonth();
-
         }
-
-        void CheckIfMonthIsStored()
-        {
-            var reslts = from state in actStates
-                         where (state.rec.Date.Month == Today.Month && state.rec.Date.Year == Today.Year)
-                         select state;
-            if (reslts.Count<BlueLifeField>() == 0)
+    }
+    void UnlockMonth()
+    {
+        monthUnlocked = true;
+        foreach (var item in actStates)
+            if (item.rec.Date.Month == Today.Month)
             {
-                for (int j = 0; j < categories.Count; j++)
+                item.IsActive = true;
+                InvokeAsync(() =>
                 {
 
-
-                    for (int i = 1; i <= DateTime.DaysInMonth(Today.Year, Today.Month); i++)
-                    {
-                        DateTime temp = new DateTime(Today.Year, Today.Month, i);
-                        BlueLifeField fld = new BlueLifeField();
-                        fld.rec.Date = temp;
-                        fld.rec.TaskState = false;
-                        fld.rec.Tasktitle = categories[j];
-                        fld.IsActive = true;
-                        actStates.Add(fld);
-
-                    }
-                }
+                    StateHasChanged();
+                });
             }
-            ls.SetItem<List<BlueLifeField>>("MainList", actStates);
-        }
-
-        void SubstractMonth()
-        {
-            Today = Today.AddMonths(-1);
-            Month = Today.Month;
-            Year = Today.Year;
-            CheckIfMonthIsStored();
-            RefillLists();
-        }
-        void AddMonth()
-        {
-            Today = Today.AddMonths(1);
-            Month = Today.Month;
-            Year = Today.Year;
-            CheckIfMonthIsStored();
-            RefillLists();
-        }
-        void SaveData()
-        {
-
-        }
-        void Clicktest()
-        {
-
-        }
-        void RefillLists()
-        {
-            foreach (var field in actStates)
+            else
             {
+                item.IsActive = false;
+                InvokeAsync(() =>
+                {
 
+                    StateHasChanged();
+                });
             }
-        }
-        void LockMonth()
-        {
-            monthUnlocked = false;
-            foreach (var item in actStates)
-            {
-                if (item.rec.Date.Day == DateTime.Now.Date.Day && item.rec.Date.Month == DateTime.Now.Date.Month && item.rec.Date.Year == DateTime.Now.Date.Year)
-                {
-                    item.IsActive = true;
-                    InvokeAsync(() =>
-                    {
+    }
+    bool SetActChecked(string cat, int day)
+    {
+        return DayTaskRecords.Exists(item => item.Date.Day == day && item.Date.Month == Today.Month && item.Date.Year == Today.Year && item.Tasktitle == cat);
+    }
+    public List<DayTaskRecord> DayTaskRecords = new List<DayTaskRecord>();
 
-                        StateHasChanged();
-                    });
+    public List<string> TaskTitles { get; set; }
 
-                }
-                else
-                {
-                    item.IsActive = false;
-                    InvokeAsync(() =>
-                    {
+    public class DayTaskRecord
+    {
+        public DateTime Date { get; set; }
+        public string Tasktitle { get; set; }
+        public bool TaskState { get; set; }
 
-                        StateHasChanged();
-                    });
-
-                }
-            }
-        }
-        void UnlockMonth()
-        {
-            monthUnlocked = true;
-            foreach (var item in actStates)
-                if (item.rec.Date.Month == Today.Month)
-                {
-                    item.IsActive = true;
-                    InvokeAsync(() =>
-                    {
-
-                        StateHasChanged();
-                    });
-                }
-                else
-                {
-                    item.IsActive = false;
-                    InvokeAsync(() =>
-                    {
-
-                        StateHasChanged();
-                    });
-                }
-        }
-        bool SetActChecked(string cat, int day)
-        {
-            return DayTaskRecords.Exists(item => item.Date.Day == day && item.Date.Month == Today.Month && item.Date.Year == Today.Year && item.Tasktitle == cat);
-        }
-        public List<DayTaskRecord> DayTaskRecords = new List<DayTaskRecord>();
-
-        public List<string> TaskTitles { get; set; }
-
-        public class DayTaskRecord
-        {
-            public DateTime Date { get; set; }
-            public string Tasktitle { get; set; }
-            public bool TaskState { get; set; }
-
-        }
-        }
+    }
+}
