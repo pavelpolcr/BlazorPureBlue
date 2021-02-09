@@ -1,14 +1,18 @@
 ﻿
-
-<input class="form-check" type="checkbox" />
+@if (IsActive == true)
+{
+    <input class="form-check" type="checkbox" value=@IsChecked/>
+}
+else
+{
+    <input class="form-check" type="checkbox" value=@IsChecked disabled />
+}
 
 @code {
-
+    [Parameter]
     public bool IsChecked { get; set; }
     [Parameter]
-    public DateTime ExaminedDate { get; set; }
-    [Parameter]
-    public int TaskIndex { get; set; }
-    BlueHandler bh = new BlueHandler();
+    public bool IsActive { get; set; }
+
 
 }
