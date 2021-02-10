@@ -4,14 +4,14 @@
 <div class="row">
 
 
-    <div class="col-11">
+    <div class="col-4">
         @if (!monthUnlocked)
         {
             <button type="button" class="btn btn-primary btn-sm" @onclick="SubstractMonth">Předchozí měsíc</button>
             <button type="button" class="btn btn-primary btn-sm" @onclick="AddMonth">Další měsíc</button>
         }
     </div>
-    <div class="col-1 btn-group-sm">
+    <div class="col-4 btn-group-sm">
         @if (monthUnlocked)
         {
             <button type="button" class="btn-sm" @onclick="LockMonth">Zamknout&Uložit </button>
@@ -22,50 +22,52 @@
         }
     </div>
 </div>
-<table>
-    <thead>
-        <tr>
-            <th scope="col">Den</th>
-            @for (int i = 1; i <= DateTime.DaysInMonth(Year, Month); i++)
-            {
-                @if (i == DateTime.Now.Day && Today.Month == DateTime.Now.Month && Today.Year == DateTime.Now.Year)
-                {
-                    <th scope="col" class="text-info">@i</th>
-                }
-                else
-                {
-                    <th scope="col">@i</th>
-                }
-
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @for (int j = 0; j < categories.Count; j++)
-        {
+<div class="table-responsive">
+    <table>
+        <thead>
             <tr>
-                <th scope="row">@categories[j]</th>
-                @for (int i = 1; i <= DateTime.DaysInMonth(Today.Year, Month); i++)
+                <th scope="col">Den</th>
+                @for (int i = 1; i <= DateTime.DaysInMonth(Year, Month); i++)
                 {
+                    @if (i == DateTime.Now.Day && Today.Month == DateTime.Now.Month && Today.Year == DateTime.Now.Year)
                     {
-            <td>
-               
-                   
-                <BlueLifeField IsActive=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j).IsActive
-                               Model=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j )/>
-
-
-            </td>
-
-
-
+                        <th scope="col" class="text-info">@i</th>
                     }
-                }
+                    else
+                    {
+                        <th scope="col">@i</th>
+                    }
 
+                }
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @for (int j = 0; j < categories.Count; j++)
+            {
+                <tr>
+                    <th scope="row">@categories[j]</th>
+                    @for (int i = 1; i <= DateTime.DaysInMonth(Today.Year, Month); i++)
+                    {
+                        {
+                            <td>
+
+
+                                <BlueLifeField IsActive=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j).IsActive
+                                               Model=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j ) />
+
+
+                            </td>
+
+
+
+                        }
+                    }
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @code {
     DateTime Today = DateTime.Now;
@@ -182,11 +184,13 @@
 
             }
         }
+        SaveData();
     }
     void UnlockMonth()
     {
         monthUnlocked = true;
         foreach (var item in actStates)
+        {
             if (item.Date.Month == Today.Month)
             {
                 item.IsActive = true;
@@ -197,6 +201,9 @@
                 item.IsActive = false;
 
             }
+        }
+        SaveData();
+
     }
 
 

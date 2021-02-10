@@ -1,16 +1,16 @@
-﻿<div class>
+﻿<div >
     @if (IsActive == true)
     {
         @if (Model.IsChecked)
         {
             <span class="badge badge-primary">
-                <input class="form-check" type="checkbox" @bind=Model.IsChecked onmouseout="Blue.SaveData" />
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked />
             </span>
         }
         else
         {
             <span class="badge badge-secondary">
-                <input class="form-check" type="checkbox" @bind=Model.IsChecked onmouseout="Blue.SaveData" />
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked />
             </span>
         }
 
@@ -20,24 +20,24 @@
         @if (Model.IsChecked)
         {
             <span class="badge badge-primary">
-                <input class="form-check" type="checkbox" @bind=Model.IsChecked onmouseout="Blue.SaveData" disabled />
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked  disabled />
             </span>
         }
         else
         {
             <span class="badge badge-secondary">
-                <input class="form-check" type="checkbox" @bind=Model.IsChecked onmouseout="Blue.SaveData" disabled />
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked disabled />
             </span>
         }
     }
 </div>
 @code {
-    
+
     [Parameter]
     public bool IsActive { get; set; }
     [Parameter]
     public BlueLifeFieldModel Model { get; set; }
-
+    
 
 
 }
