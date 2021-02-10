@@ -1,18 +1,19 @@
 ﻿
 @if (IsActive == true)
 {
-    <input class="form-check" type="checkbox" value=@rec.TaskState onclick="Clicktest"/>
+    <input class="form-check" type="checkbox" @bind=Model.IsChecked onclick="Clicktest"/>
 }
 else
 {
-    <input class="form-check" type="checkbox" value=@rec.TaskState onclick="Clicktest" disabled />
+    <input class="form-check" type="checkbox" @bind=Model.IsChecked onclick="Clicktest" disabled />
 }
 
 @code {
-    [Parameter]
-    public Blue2.DayTaskRecord rec { get; set; } = new Blue2.DayTaskRecord();
     
+    [Parameter]
     public bool IsActive { get; set; }
+    [Parameter]
+    public BlueLifeFieldModel Model { get; set; }
 
 
 
