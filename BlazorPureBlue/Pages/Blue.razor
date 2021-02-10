@@ -52,7 +52,7 @@
                
                    
                 <BlueLifeField IsActive=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j).IsActive
-                               Model=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j)/>
+                               Model=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j )/>
 
 
             </td>
@@ -93,7 +93,13 @@
         }
         else
         {
-            categories.Add("Rann9 mzt9 studenou vodo ua je3t2 n2co a+t je to dostate4n2 dlouhe");
+            categories.Add("Ranní cvičení (alespoň 15 minut)");
+            categories.Add("Čištění zubů (ráno a večer)");
+            categories.Add("Mytí se studenou vodou (celé tělo)");
+            categories.Add("Slušná mluva celý den (ani jedno hrubé či sprosté slovo)");
+            categories.Add("Čestné chování (nelhat, nešidit, neurážet, neubližovat, nepoškozovat majetek)");
+            categories.Add("Dobrý skutek (alespoň jeden denně)");
+            categories.Add("Radostný prožitek (např. přečíst si kousek knihy)");
             ls.SetItem<List<string>>("CatList", categories);
         }
         CheckIfMonthIsStored();
@@ -144,9 +150,9 @@
         CheckIfMonthIsStored();
         RefillLists();
     }
-    void SaveData()
+    public void SaveData()
     {
-
+        ls.SetItem<List<BlueLifeFieldModel>>("MainList", actStates);
     }
     void Clicktest()
     {
@@ -201,5 +207,5 @@
         public bool TaskState { get; set; }
 
     }
-    
+
 }

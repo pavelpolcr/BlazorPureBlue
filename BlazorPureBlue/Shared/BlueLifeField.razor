@@ -1,13 +1,36 @@
-﻿
-@if (IsActive == true)
-{
-    <input class="form-check" type="checkbox" @bind=Model.IsChecked onclick="Clicktest"/>
-}
-else
-{
-    <input class="form-check" type="checkbox" @bind=Model.IsChecked onclick="Clicktest" disabled />
-}
+﻿<div class>
+    @if (IsActive == true)
+    {
+        @if (Model.IsChecked)
+        {
+            <span class="badge badge-primary">
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked onmouseout="Blue.SaveData" />
+            </span>
+        }
+        else
+        {
+            <span class="badge badge-secondary">
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked onmouseout="Blue.SaveData" />
+            </span>
+        }
 
+    }
+    else
+    {
+        @if (Model.IsChecked)
+        {
+            <span class="badge badge-primary">
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked onmouseout="Blue.SaveData" disabled />
+            </span>
+        }
+        else
+        {
+            <span class="badge badge-secondary">
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked onmouseout="Blue.SaveData" disabled />
+            </span>
+        }
+    }
+</div>
 @code {
     
     [Parameter]
