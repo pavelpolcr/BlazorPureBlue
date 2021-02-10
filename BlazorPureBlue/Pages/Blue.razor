@@ -1,94 +1,211 @@
 ﻿@page "/blue"
+@inject Blazored.LocalStorage.ISyncLocalStorageService ls
+<h3>@Today.Year.ToString() @Today.ToString("MMMM").ToUpper()</h3>
+<div class="row">
 
-<h3>@Today.Year.ToString(), @Today.ToString("MMMM")</h3>
-<button type="button" class="btn btn-primary btn-sm" @onclick="SubstractMonth">Previous Month</button>
-<button type="button" class="btn btn-primary btn-sm" @onclick="AddMonth">Next Month</button>
-<table class="table table-sm">
+
+    <div class="col-11">
+        @if (!monthUnlocked)
+        {
+            <button type="button" class="btn btn-primary btn-sm" @onclick="SubstractMonth">Předchozí měsíc</button>
+            <button type="button" class="btn btn-primary btn-sm" @onclick="AddMonth">Další měsíc</button>
+        }
+    </div>
+    <div class="col-1 btn-group-sm">
+        @if (monthUnlocked)
+        {
+            <button type="button" class="btn-sm" @onclick="LockMonth">Zamknout&Uložit </button>
+        }
+        else
+        {
+            <button type="button" class="btn-sm" @onclick="UnlockMonth">Odemknout</button>
+        }
+    </div>
+</div>
+<table>
     <thead>
         <tr>
             <th scope="col">Den</th>
-            @for (int i = 0; i <= DateTime.DaysInMonth(Year, Month); i++)
+            @for (int i = 1; i <= DateTime.DaysInMonth(Year, Month); i++)
             {
-                <th scope="col">@i</th>
+                @if (i == DateTime.Now.Day && Today.Month == DateTime.Now.Month && Today.Year == DateTime.Now.Year)
+                {
+                    <th scope="col" class="text-info">@i</th>
+                }
+                else
+                {
+                    <th scope="col">@i</th>
+                }
+
             }
         </tr>
     </thead>
     <tbody>
-        @for (int j = 0; j <= 7; j++)
+        @for (int j = 0; j < categories.Count; j++)
         {
-        <tr>
-            <th scope="row">polozka @j</th>
-            @for (int i = 0; i <= DateTime.DaysInMonth(Year, Month); i++)
-            {
-                @code{
-                    bool IsChecked = false;
-                    DateTime trydate = DateTime.Now.Date;
-                }
-                @if (!IsCheckedDictionary.TryGetValue(trydate, out IsChecked))
+            <tr>
+                <th scope="row">@categories[j]</th>
+                @for (int i = 1; i <= DateTime.DaysInMonth(Today.Year, Month); i++)
                 {
-                    IsCheckedDictionary.Add(trydate, false);
-                }
-                @if (i == DateTime.Now.Day&&Today.Month==DateTime.Now.Month&&Today.Year==DateTime.Now.Year)
-                {
-                    <td><input class="form-check" type="checkbox" @onclick="GetValueCheckBox" @onmouseout="SaveData"/></td>
-                }
-                else
-                {
-                    <td><input class="form-check" type="checkbox" disabled @onclick="GetValueCheckBox" @onmouseout="SaveData"/></td>
-                }
-                
-            }
+                    {
+            <td>
+               
+                   
+                <BlueLifeField IsActive=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j).IsActive
+                               Model=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j )/>
 
 
-        </tr>
+            </td>
+
+
+
+                    }
+                }
+
+            </tr>
         }
     </tbody>
 </table>
+
 @code {
-    List<string> BLItems = new List<string>();
-    Dictionary<DateTime, bool> IsCheckedDictionary = new Dictionary<DateTime, bool>();
     DateTime Today = DateTime.Now;
     int Month = DateTime.Now.Month;
     int Year = DateTime.Now.Year;
+    bool monthUnlocked = false;
+    bool actchecked = false;
+    public List<BlueLifeFieldModel> actStates;
+    public List<string> categories = new List<string>();
+    public BlueLifeFieldModel temp = new BlueLifeFieldModel();
 
+    protected override void OnInitialized()
+    {
+        actStates = new List<BlueLifeFieldModel>();
+        if (ls.ContainKey("MainList"))
+        {
+
+            actStates = ls.GetItem<List<BlueLifeFieldModel>>("MainList");
+        }
+
+        if (ls.ContainKey("CatList"))
+        {
+
+            categories = ls.GetItem<List<string>>("CatList");
+        }
+        else
+        {
+            categories.Add("Ranní cvičení (alespoň 15 minut)");
+            categories.Add("Čištění zubů (ráno a večer)");
+            categories.Add("Mytí se studenou vodou (celé tělo)");
+            categories.Add("Slušná mluva celý den (ani jedno hrubé či sprosté slovo)");
+            categories.Add("Čestné chování (nelhat, nešidit, neurážet, neubližovat, nepoškozovat majetek)");
+            categories.Add("Dobrý skutek (alespoň jeden denně)");
+            categories.Add("Radostný prožitek (např. přečíst si kousek knihy)");
+            ls.SetItem<List<string>>("CatList", categories);
+        }
+        CheckIfMonthIsStored();
+        LockMonth();
+
+    }
+
+    void CheckIfMonthIsStored()
+    {
+        var reslts = from state in actStates
+                     where (state.Date.Month == Today.Month && state.Date.Year == Today.Year)
+                     select state;
+        if (reslts.Count<BlueLifeFieldModel>() == 0)
+        {
+            for (int j = 0; j < categories.Count; j++)
+            {
+
+
+                for (int i = 1; i <= DateTime.DaysInMonth(Today.Year, Today.Month); i++)
+                {
+                    DateTime temp = new DateTime(Today.Year, Today.Month, i);
+                    BlueLifeFieldModel fld = new BlueLifeFieldModel();
+                    fld.Date = temp;
+                    fld.IsActive = false;
+                    fld.CatIndex = j;
+                    fld.IsChecked = false;
+                    actStates.Add(fld);
+
+                }
+            }
+        }
+        ls.SetItem<List<BlueLifeFieldModel>>("MainList", actStates);
+    }
 
     void SubstractMonth()
     {
         Today = Today.AddMonths(-1);
         Month = Today.Month;
         Year = Today.Year;
+        CheckIfMonthIsStored();
+        RefillLists();
     }
     void AddMonth()
     {
         Today = Today.AddMonths(1);
         Month = Today.Month;
         Year = Today.Year;
+        CheckIfMonthIsStored();
+        RefillLists();
     }
-    void SaveData()
+    public void SaveData()
+    {
+        ls.SetItem<List<BlueLifeFieldModel>>("MainList", actStates);
+    }
+    void Clicktest()
     {
 
     }
-    void GetValueCheckBox()
+    void RefillLists()
     {
-
-    }
-    public class BlueHandler
-    {
-        public BlueHandler()
+        foreach (var field in actStates)
         {
-            DayTaskRecords = new List<DayTaskRecord>();
-            TaskTitles = new List<string>();
+
         }
-
-        public List<DayTaskRecord> DayTaskRecords { get; set; }
-
-        public List<string> TaskTitles { get; set; }
     }
+    void LockMonth()
+    {
+        monthUnlocked = false;
+        foreach (var item in actStates)
+        {
+            if (item.Date.Day == DateTime.Now.Date.Day && item.Date.Month == DateTime.Now.Date.Month && item.Date.Year == DateTime.Now.Date.Year)
+            {
+                item.IsActive = true;
+
+
+            }
+            else
+            {
+                item.IsActive = false;
+
+            }
+        }
+    }
+    void UnlockMonth()
+    {
+        monthUnlocked = true;
+        foreach (var item in actStates)
+            if (item.Date.Month == Today.Month)
+            {
+                item.IsActive = true;
+
+            }
+            else
+            {
+                item.IsActive = false;
+
+            }
+    }
+
+
     public class DayTaskRecord
     {
         public DateTime Date { get; set; }
-        public int TaskIndex { get; set; }
-    }
+        public string Tasktitle { get; set; }
+        public bool TaskState { get; set; }
 
+    }
 
 }
