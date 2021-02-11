@@ -53,7 +53,7 @@
 
 
                                 <BlueLifeField IsActive=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j).IsActive
-                                               Model=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j ) />
+                                               Model=@actStates.Find(r => r.Date.Day == i && r.Date.Month == Today.Month && r.Date.Year == Today.Year && r.CatIndex == j ) OnMouseOut="SaveData"/>
 
 
                             </td>

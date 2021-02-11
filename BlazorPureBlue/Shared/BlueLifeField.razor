@@ -1,16 +1,17 @@
-﻿<div >
+﻿@inject Blazored.LocalStorage.ISyncLocalStorageService ls
+<div>
     @if (IsActive == true)
     {
         @if (Model.IsChecked)
         {
             <span class="badge badge-primary">
-                <input class="form-check" type="checkbox" @bind=Model.IsChecked />
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked @onmouseout="@(() => OnMouseOut.InvokeAsync("e"))"/>
             </span>
         }
         else
         {
             <span class="badge badge-secondary">
-                <input class="form-check" type="checkbox" @bind=Model.IsChecked />
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked @onmouseout="@(() => OnMouseOut.InvokeAsync("e"))" />
             </span>
         }
 
@@ -20,13 +21,13 @@
         @if (Model.IsChecked)
         {
             <span class="badge badge-primary">
-                <input class="form-check" type="checkbox" @bind=Model.IsChecked  disabled />
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked @onmouseout="@(() => OnMouseOut.InvokeAsync("e"))" disabled />
             </span>
         }
         else
         {
             <span class="badge badge-secondary">
-                <input class="form-check" type="checkbox" @bind=Model.IsChecked disabled />
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked @onmouseout="@(() => OnMouseOut.InvokeAsync("e"))" disabled />
             </span>
         }
     }
@@ -37,7 +38,11 @@
     public bool IsActive { get; set; }
     [Parameter]
     public BlueLifeFieldModel Model { get; set; }
-    
+    [Parameter]
+    public EventCallback OnMouseOut { get; set; }
+
+
+
 
 
 }
