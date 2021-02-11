@@ -21,13 +21,13 @@
         @if (Model.IsChecked)
         {
             <span class="badge badge-primary">
-                <input class="form-check" type="checkbox" @bind=Model.IsChecked @onmouseout="@(() => OnMouseOut.InvokeAsync("e"))" disabled />
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked disabled />
             </span>
         }
         else
         {
             <span class="badge badge-secondary">
-                <input class="form-check" type="checkbox" @bind=Model.IsChecked @onmouseout="@(() => OnMouseOut.InvokeAsync("e"))" disabled />
+                <input class="form-check" type="checkbox" @bind=Model.IsChecked disabled />
             </span>
         }
     }

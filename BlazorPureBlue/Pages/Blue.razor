@@ -1,6 +1,9 @@
 ﻿@page "/blue"
-@inject Blazored.LocalStorage.ISyncLocalStorageService ls
-<h3>@Today.Year.ToString() @Today.ToString("MMMM").ToUpper()</h3>
+@inject Blazored.LocalStorage.ILocalStorageService ls
+<h3>
+    @Today.Year.ToString() @Today.ToString("MMMM").ToUpper()
+    <small class="text-muted"> Tento měsíc máš splněno @donecount z @nfields.</small>
+</h3>
 <div class="row">
 
 
@@ -9,11 +12,13 @@
         {
             <button type="button" class="btn btn-primary btn-sm" @onclick="SubstractMonth">Předchozí měsíc</button>
             <button type="button" class="btn btn-primary btn-sm" @onclick="AddMonth">Další měsíc</button>
+            <button type="button" class="btn alert-success btn-sm" @onclick="SaveData">Ulozit zmeny</button>
         }
     </div>
     <div class="col-4 btn-group-sm">
         @if (monthUnlocked)
         {
+            
             <button type="button" class="btn-sm" @onclick="LockMonth">Zamknout&Uložit </button>
         }
         else
@@ -73,25 +78,27 @@
     DateTime Today = DateTime.Now;
     int Month = DateTime.Now.Month;
     int Year = DateTime.Now.Year;
+    int nfields;
+    int donecount;
     bool monthUnlocked = false;
     bool actchecked = false;
     public List<BlueLifeFieldModel> actStates;
     public List<string> categories = new List<string>();
     public BlueLifeFieldModel temp = new BlueLifeFieldModel();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         actStates = new List<BlueLifeFieldModel>();
-        if (ls.ContainKey("MainList"))
+        if (await ls.ContainKeyAsync("MainList"))
         {
 
-            actStates = ls.GetItem<List<BlueLifeFieldModel>>("MainList");
+            actStates = await ls.GetItemAsync<List<BlueLifeFieldModel>>("MainList");
         }
 
-        if (ls.ContainKey("CatList"))
+        if (await ls.ContainKeyAsync("CatList"))
         {
 
-            categories = ls.GetItem<List<string>>("CatList");
+            categories = await ls.GetItemAsync<List<string>>("CatList");
         }
         else
         {
@@ -102,10 +109,13 @@
             categories.Add("Čestné chování (nelhat, nešidit, neurážet, neubližovat, nepoškozovat majetek)");
             categories.Add("Dobrý skutek (alespoň jeden denně)");
             categories.Add("Radostný prožitek (např. přečíst si kousek knihy)");
-            ls.SetItem<List<string>>("CatList", categories);
+            await ls.SetItemAsync<List<string>>("CatList", categories);
         }
-        CheckIfMonthIsStored();
-        LockMonth();
+         CheckIfMonthIsStored();
+         LockMonth();
+         RefreshCounts();
+
+
 
     }
 
@@ -133,7 +143,8 @@
                 }
             }
         }
-        ls.SetItem<List<BlueLifeFieldModel>>("MainList", actStates);
+        //SaveData();
+
     }
 
     void SubstractMonth()
@@ -142,31 +153,32 @@
         Month = Today.Month;
         Year = Today.Year;
         CheckIfMonthIsStored();
-        RefillLists();
+        RefreshCounts();
+
+
     }
     void AddMonth()
     {
         Today = Today.AddMonths(1);
         Month = Today.Month;
         Year = Today.Year;
+        //await CheckIfMonthIsStored();
+        //await RefreshCounts();
         CheckIfMonthIsStored();
-        RefillLists();
-    }
-    public void SaveData()
-    {
-        ls.SetItem<List<BlueLifeFieldModel>>("MainList", actStates);
-    }
-    void Clicktest()
-    {
+        RefreshCounts();
 
     }
-    void RefillLists()
+    public async Task SaveData()
     {
-        foreach (var field in actStates)
-        {
-
-        }
+         //await ls.SetItemAsync<List<BlueLifeFieldModel>>("MainList", actStates);
+         RefreshCounts();
     }
+    void RefreshCounts()
+    {
+        nfields = DateTime.DaysInMonth(Today.Year, Today.Month) * categories.Count;
+        donecount = actStates.Count(st => st.Date.Month == Today.Month && st.Date.Year == Today.Year && st.IsChecked == true);
+    }
+
     void LockMonth()
     {
         monthUnlocked = false;
@@ -202,7 +214,7 @@
 
             }
         }
-        SaveData();
+        //SaveData();
 
     }
 
